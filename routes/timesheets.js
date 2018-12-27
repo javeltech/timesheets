@@ -88,7 +88,7 @@ router.post('/add', ensureAuthenticated, (req, res) => {
 
       if (!req.body.task) {
         errors.push({
-          text: 'Please provide a task',
+          text: 'Please provide a tas',
           task: true
         });
       }
