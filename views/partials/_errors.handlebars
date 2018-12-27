@@ -1,0 +1,16 @@
+
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    {{error}}
+  </div>
+{{/if}}
+
+{{#each errors}}
+  <div class="alert alert-danger alert-dismissible">
+    <a href="#" class="close pb-4" data-dismiss="alert" aria-label="close"><span class="fas fa-times"></span></a>
+    {{text}}
+  </div>
+{{else}}
+
+{{/each}}

@@ -1,0 +1,80 @@
+<style>
+  .card {
+      font-size: .875rem;
+    }
+    
+    .time-form {
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+    
+    .time-form .comments-card .card-header{
+      background-color: #e9ecef;
+      padding: .25rem .5rem;
+      color: #495057;
+    }
+    .time-form #comments {
+      border: none;
+    }
+
+    .time-card .card-header{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+    
+    .time-card .card-body{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+
+    .time-container{
+      background-color: white !important;
+    }
+    
+  </style>
+<title>Timesheet</title>
+</head>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-5 mx-auto">
+      {{> _msg}}
+      <div class="form card card-body bg-white p-5">
+        <h5 class="text-center mb-4">Login to Timesheets</h5>
+        {{> _errors}}
+        <form action="/users/login" method="post">
+          <div class="input-group input-group-sm mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-envelope fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <input type="email" id="email" name="email" placeholder="Email" value="{{email}}" class="form-control">
+          </div>
+          {{#each errors}}
+          {{#if email}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="input-group input-group-sm mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-unlock fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <input type="password" id="password" name="password" placeholder="Password" value="{{password}}" class="form-control">
+          </div>
+          {{#each errors}}
+          {{#if password}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <input type="submit" class="btn btn-sm btn-block btn-success" id="submit" value="Login">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/app.js"></script>
+</body>
+
+</html>

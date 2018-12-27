@@ -1,0 +1,157 @@
+<style>
+  .card {
+      font-size: .875rem;
+    }
+    
+    .time-form {
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+    
+    .time-form .comments-card .card-header{
+      background-color: #e9ecef;
+      padding: .25rem .5rem;
+      color: #495057;
+    }
+    .time-form #comments {
+      border: none;
+    }
+
+    .time-card .card-header{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+    
+    .time-card .card-body{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+
+    .time-container{
+      background-color: white !important;
+    }
+    
+  </style>
+
+<div class="container  mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="form card card-body  p-5">
+        <form action="/timesheets/edit/{{_id}}?_method=PUT" method="post" class="time-form">
+        <input type="hidden" name="_method" value="PUT">
+          <h5>Edit Time</h5>
+          <hr>
+          <div class="input-group input-group-sm mb">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-tasks fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <input type="text" id="task" name="task" placeholder="Task" value="{{task}}" class="form-control">
+          </div>
+          {{#each errors}}
+          {{#if task}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="input-group input-group-sm mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-user fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <select class="form-control form-control-sm" id="client" name="client" >
+              
+              <option value="">
+                Select Client...
+              </option>
+              {{#each clients}}
+              <option value="{{value}}" {{#areEqual value ../client}}selected{{/areEqual}}>
+                {{text}} 
+              </option>
+              {{/each}}
+            </select>
+          </div>
+          {{#each errors}}
+          {{#if client}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="input-group input-group-sm mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-calendar fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <input type="date" id="date" name="date" placeholder="Date" value="{{date}}" class="form-control form-control-sm">
+          </div>
+          {{#each errors}}
+          {{#if date}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="row">
+            <div class="col-6">
+              <div class="input-group input-group-sm mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-hourglass-start fa-lg text-secondary"></i>
+                  </span>
+                </div>
+                <input type="time" id="startTime" name="startTime" class="form-control form-control-sm" value="{{startTime}}"
+                  >
+              </div>
+              {{#each errors}}
+              {{#if startTime}}
+              <p class="text-danger m-0">{{text}}</p>
+              {{/if}}
+              {{/each}}
+            </div>
+            <div class="col-6">
+              <div class="input-group input-group-sm mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-hourglass-end fa-lg text-secondary"></i>
+                  </span>
+                </div>
+                <input type="time" id="endTime" name="endTime" class="form-control form-control-sm" value="{{endTime}}"
+                  >
+              </div>
+              {{#each errors}}
+              {{#if endTime}}
+              <p class="text-danger m-0">{{text}}</p>
+              {{/if}}
+              {{/each}}
+            </div>
+          </div>
+          {{#each errors}}
+          {{#if validTime}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="card mt-2 mb-2 comments-card">
+            <div class="card-header">
+              <i class="fas fa-comments fa-lg text-secondary"></i> Comments
+            </div>
+            <div class="input-group">
+              <textarea name="comments" id="comments" rows="3" class="form-control form-control-sm">{{comments}}</textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <input type="submit" class="btn btn-sm btn-block btn-success" id="submit-time" value="Submit">
+            </div>
+            <div class="col-6">
+              <a href="/timesheets/add" class="btn btn-sm btn-block btn-danger text-white" id="cancel">Cancel</a>
+            </div>
+          </div>
+        </form>
+        <hr>
+      </div>
+      <!--card-->
+    </div>
+    <!--col-->
+  </div>
+  <!--row-->
+</div>
+<!--container-->

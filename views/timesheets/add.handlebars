@@ -1,0 +1,214 @@
+<style>
+  .card {
+      font-size: .875rem;
+    }
+    
+    .time-form {
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+    
+    .time-form .comments-card .card-header{
+      background-color: #e9ecef;
+      padding: .25rem .5rem;
+      color: #495057;
+    }
+    .time-form #comments {
+      border: none;
+    }
+
+    .time-card .card-header{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+    
+    .time-card .card-body{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+    }
+
+    .time-container{
+      background-color: white !important;
+    }
+    
+  </style>
+
+<div class="container  mt-4 mb-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="form card card-body ">
+        <form action="/timesheets/add" method="post" class="time-form">
+          <h5>Add Time</h5>
+          <hr>
+          {{> _msg}}
+          <div class="input-group input-group-sm mb">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-tasks fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <input type="text" id="task" name="task" placeholder="Task" value="{{task}}" class="form-control">
+          </div>
+          {{#each errors}}
+          {{#if task}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="input-group input-group-sm mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-user fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <select class="form-control form-control-sm" id="client" name="client" >
+              
+              <option value="">
+                Select Client...
+              </option>
+              {{#each clients}}
+              <option value="{{value}}" {{#areEqual value ../client}}selected{{/areEqual}}>
+                {{text}} 
+              </option>
+              {{/each}}
+            </select>
+          </div>
+          {{#each errors}}
+          {{#if client}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="input-group input-group-sm mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-calendar fa-lg text-secondary"></i>
+              </span>
+            </div>
+            <input type="date" id="date" name="date" placeholder="Date" value="{{date}}" class="form-control form-control-sm">
+          </div>
+          {{#each errors}}
+          {{#if date}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          {{#each errors}}
+          {{#if validDate}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="row">
+            <div class="col">
+              <div class="input-group input-group-sm mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-hourglass-start fa-lg text-secondary"></i>
+                  </span>
+                </div>
+                <input type="time" id="startTime" name="startTime" class="form-control form-control-sm" value="{{startTime}}"
+                  >
+              </div>
+              {{#each errors}}
+              {{#if startTime}}
+              <p class="text-danger m-0">{{text}}</p>
+              {{/if}}
+              {{/each}}
+            </div>
+            <div class="col">
+              <div class="input-group input-group-sm mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-hourglass-end fa-lg text-secondary"></i>
+                  </span>
+                </div>
+                <input type="time" id="endTime" name="endTime" class="form-control form-control-sm" value="{{endTime}}"
+                  >
+              </div>
+              {{#each errors}}
+              {{#if endTime}}
+              <p class="text-danger m-0">{{text}}</p>
+              {{/if}}
+              {{/each}}
+            </div>
+          </div>
+          {{#each errors}}
+          {{#if validTime}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          {{#each errors}}
+          {{#if validPeriod}}
+          <p class="text-danger m-0">{{text}}</p>
+          {{/if}}
+          {{/each}}
+          <div class="card mt-2 mb-2 comments-card">
+            <div class="card-header">
+              <i class="fas fa-comments fa-lg text-secondary"></i> Comments
+            </div>
+            <div class="input-group">
+              <textarea name="comments" id="comments" rows="3" class="form-control form-control-sm">{{comments}}</textarea>
+            </div>
+          </div>
+          <input type="submit" class="btn btn-sm btn-block btn-success" id="submit" value="Submit">
+        </form>
+
+        <hr>
+
+        <div class="card border-primary time-card mt-2">
+          <div class="card-header bg-primary text-white">
+            <div class="row">
+              <div class="col-6">
+                <h6 class="text-left">Today</h6>
+              </div>
+              <div class="col-6">
+                <h6 class="text-right">Total: {{total}}</h6>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <tbody>
+                  {{#each timesheets}}
+                  <tr>
+                    <td>{{task}}</td>
+                    <td>{{client}}</td>
+                    <td>{{startTime}}</td>
+                    <td>{{endTime}}</td>
+                    <td class="font-weight-bold">{{duration}}</td>
+                    <td><a href="/timesheets/edit/{{_id}}"><i class="fa fa-edit text-success"></i></a></td>
+                    <td><a href="/timesheets/delete/{{_id}}"><i class="fa fa-trash text-danger"></i></a></td>
+                  </tr>
+
+                  {{/each}}
+                  {{!-- <tr>
+                    <td>Design</td>
+                    <td>Courts Jamaica - Mark Brown (Director)</td>
+                    <td>9:00 AM</td>
+                    <td>5:00 PM</td>
+                    <td class="font-weight-bold">8:00:00</td>
+                    <td><i class="fa fa-edit text-success"></i></td>
+                    <td><i class="fa fa-trash text-danger"></i></td>
+                  </tr>
+                  <tr>
+                    <td>Re-design</td>
+                    <td>Courts Jamaica - Mark Brown (Director)</td>
+                    <td>9:00 PM</td>
+                    <td>10:00 PM</td>
+                    <td class="font-weight-bold">1:00:00</td>
+                    <td><i class="fa fa-edit text-success"></i></td>
+                    <td><i class="fa fa-trash text-danger"></i></td>
+                  </tr> --}}
+                </tbody>
+              </table>
+            </div>
+            <!--table-responsive-->
+          </div>
+        </div>
+        <!--card-->
+      </div>
+      <!--card-->
+    </div>
+    <!--col-->
+  </div>
+  <!--row-->
+</div>
+<!--container-->
