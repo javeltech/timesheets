@@ -144,6 +144,11 @@ app.get('/', (req, res) => {
 app.use('/users', users);
 // timesheets routes
 app.use('/timesheets', timesheets);
+// invalid route redirect
+app.get('/*', function(req, res) {
+  res.redirect('/')
+});
+
 
 // start server
 app.listen(port, () => {
