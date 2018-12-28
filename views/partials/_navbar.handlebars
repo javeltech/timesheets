@@ -9,13 +9,16 @@
         {{#if user}}
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-          <span class="nav-link text-white border">{{user.firstName}} {{user.lastName}} - {{user.email}}</span>
+          <span class="nav-link text-white border mt-2 p-2">{{user.firstName}} {{user.lastName}} - {{user.email}}</span>
         </li>
         </ul>
        {{/if}}
 
       <ul class="navbar-nav ml-auto">
         {{#if user}}
+         <li class="nav-item">
+          <a href="/timesheets/add" class="nav-link {{#if add}}active{{/if}}">Add</a>
+        </li>
         <li class="nav-item">
           <a href="/users/logout" class="nav-link">Logout</a>
         </li>

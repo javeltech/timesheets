@@ -70,7 +70,8 @@ router.get('/add', ensureAuthenticated, (req, res) => {
           res.render('timesheets/add', {
             timesheets: newTimesheets,
             total: totalTime,
-            clients: clientList
+            clients: clientList,
+            add: true
           });
         })
         .catch(err => console.log(err));
@@ -85,10 +86,11 @@ router.post('/add', ensureAuthenticated, (req, res) => {
     .then(timesheets => {
       // server side validation
       let errors = [];
+      let ts = timesheets;
 
       if (!req.body.task) {
         errors.push({
-          text: 'Please provide a tas',
+          text: 'Please provide a task',
           task: true
         });
       }
@@ -124,60 +126,37 @@ router.post('/add', ensureAuthenticated, (req, res) => {
       }
 
       if (req.body.startTime && req.body.endTime && req.body.date) {
-
         let startTime = new Date(`${req.body.date} ${req.body.startTime}:00`);
         let endTime = new Date(`${req.body.date} ${req.body.endTime}:00`);
-        if (timesheets.length > 0) {
-          for (let i = 0; i <= timesheets.length; i++) {
-            console.log(timesheets[i])
-            if ((startTime >= timesheets[i].startTime && startTime <= timesheets[i].endTime) || (endTime >= timesheets[i].startTime && endTime <= timesheets[i].endTime)) {
-              console.log('error')
-              errors.push({
-                text: 'Please provide a valid start or end time - a previous task was completed during this period',
-                validTime: true
-              });
-              break
-            }
-
-
-          }
-        }
-
-
         if (startTime > Date.now()) {
           errors.push({
             text: 'Please provide a valid start time - the time provided is in the future',
             validStartTime: true
           });
         }
-
         if (endTime > Date.now()) {
           errors.push({
             text: 'Please provide a valid end time - the time provided is in the future',
             validEndTime: true
           });
         }
-
         if (req.body.startTime >= req.body.endTime) {
           errors.push({
-            text: 'Please provide a valid start or end time',
+            text: 'Please provide a valid start or end time - the end cannot occur before or be the same as the start',
             validTime: true
           });
         }
-
-
-
-
-
+        for (let i = 0; i <= ts.length - 1; i++) {
+          if ((startTime >= ts[i].startTime && startTime <= ts[i].endTime) || (endTime >= ts[i].startTime && endTime <= ts[i].endTime)) {
+            console.log('error')
+            errors.push({
+              text: 'Please provide a valid start or end time - a previous task was completed during this period',
+              validPeriod: true
+            });
+            break
+          }
+        }
       }
-
-
-
-
-
-
-      console.log(errors)
-
 
       if (errors.length > 0) {
         let start = new Date();
@@ -210,13 +189,11 @@ router.post('/add', ensureAuthenticated, (req, res) => {
                 duration: moment.duration(timesheet.duration).format("h [hrs], m [min]")
               }
             });
-
             if (total === 0) {
               totalTime = '0 hrs 0 min'
             } else {
               totalTime = moment.duration(total).format("h [hrs], m [min]");
             }
-
             Client.find({})
               .then(clients => {
                 let clientList = clients.map(client => {
@@ -235,7 +212,8 @@ router.post('/add', ensureAuthenticated, (req, res) => {
                   comments: req.body.comments,
                   timesheets: newTimesheets,
                   total: totalTime,
-                  clients: clientList
+                  clients: clientList,
+                  add: true
                 });
               })
               .catch(err => console.log(err));
@@ -302,94 +280,232 @@ router.get('/edit/:id', ensureAuthenticated, (req, res) => {
 
 // edit put
 router.put('/edit/:id', (req, res) => {
-  let errors = [];
+  Timesheet.find({
+      user: req.user._id
+    })
+    .then(timesheets => {
+      // server side validation
+      let errors = [];
+      let ts = timesheets;
 
-  if (!req.body.task) {
-    errors.push({
-      text: 'Please provide a task',
-      task: true
-    });
-  }
-  if (!req.body.client) {
-    errors.push({
-      text: 'Please provide a client',
-      client: true
-    });
-  }
-  if (!req.body.date) {
-    errors.push({
-      text: 'Please provide a date',
-      date: true
-    });
-  }
-  if (!req.body.startTime) {
-    errors.push({
-      text: 'Please provide a start time',
-      startTime: true
-    });
-  }
-  if (!req.body.endTime) {
-    errors.push({
-      text: 'Please provide an end time',
-      endTime: true
-    });
-  }
-  if (req.body.startTime > req.body.endTime) {
-    errors.push({
-      text: 'Please provide a valid start or end time',
-      validTime: true
-    });
-  }
-
-  if (errors.length > 0) {
-    Client.find({})
-      .then(clients => {
-        let clientList = clients.map(client => {
-          return {
-            value: client._id,
-            text: `${client.name} - ${client.manager.firstName} ${client.manager.lastName} - ${client.manager.position}`
-          }
-        })
-        res.render('timesheets/edit', {
-          _id: req.params.id,
-          errors: errors,
-          task: req.body.task,
-          client: req.body.client,
-          date: req.body.date,
-          startTime: req.body.startTime,
-          endTime: req.body.endTime,
-          comments: req.body.comments,
-          clients: clientList
+      if (!req.body.task) {
+        errors.push({
+          text: 'Please provide a task',
+          task: true
         });
-      })
-      .catch(err => console.log(err));
+      }
+      if (!req.body.client) {
+        errors.push({
+          text: 'Please provide a client',
+          client: true
+        });
+      }
+      if (!req.body.date) {
+        errors.push({
+          text: 'Please provide a date',
+          date: true
+        });
+      }
+      if (new Date(req.body.date) > Date.now()) {
+        errors.push({
+          text: 'Please provide a valid date',
+          validDate: true
+        });
+      }
+      if (!req.body.startTime) {
+        errors.push({
+          text: 'Please provide a start time',
+          startTime: true
+        });
+      }
+      if (!req.body.endTime) {
+        errors.push({
+          text: 'Please provide an end time',
+          endTime: true
+        });
+      }
 
-  } else {
-    Timesheet.findOne({
-        _id: req.params.id
-      })
-      .then(timesheet => {
-        let date = new Date(`${req.body.date}T05:00:00.000Z`);
+      if (req.body.startTime && req.body.endTime && req.body.date) {
         let startTime = new Date(`${req.body.date} ${req.body.startTime}:00`);
         let endTime = new Date(`${req.body.date} ${req.body.endTime}:00`);
-        let duration = endTime.getTime() - startTime.getTime()
+        if (startTime > Date.now()) {
+          errors.push({
+            text: 'Please provide a valid start time - the time provided is in the future',
+            validStartTime: true
+          });
+        }
+        if (endTime > Date.now()) {
+          errors.push({
+            text: 'Please provide a valid end time - the time provided is in the future',
+            validEndTime: true
+          });
+        }
+        if (req.body.startTime >= req.body.endTime) {
+          errors.push({
+            text: 'Please provide a valid start or end time - the end cannot occur before or be the same as the start',
+            validTime: true
+          });
+        }
+        for (let i = 0; i <= ts.length - 1; i++) {
+          if (req.params.id == ts[i]._id) {
+            break;
+          } else {
+            if ((startTime >= ts[i].startTime && startTime <= ts[i].endTime) || (endTime >= ts[i].startTime && endTime <= ts[i].endTime)) {
+              console.log('error')
+              errors.push({
+                text: 'Please provide a valid start or end time - a previous task was completed during this period',
+                validPeriod: true
+              });
+              break;
+            }
+          }
 
+        }
+      }
 
-        timesheet.task = req.body.task;
-        timesheet.client = req.body.client;
-        timesheet.date = date;
-        timesheet.startTime = startTime;
-        timesheet.endTime = endTime;
-        timesheet.comments = req.body.comments;
-        timesheet.duration = duration;
-        timesheet.save()
-          .then(timesheet => {
-            res.redirect('/timesheets/add');
+      if (errors.length > 0) {
+
+        Client.find({})
+          .then(clients => {
+            let clientList = clients.map(client => {
+              return {
+                value: client._id,
+                text: `${client.name} - ${client.manager.firstName} ${client.manager.lastName} - ${client.manager.position}`
+              }
+            })
+            res.render('timesheets/edit', {
+              _id: req.params.id,
+              errors: errors,
+              task: req.body.task,
+              client: req.body.client,
+              date: req.body.date,
+              startTime: req.body.startTime,
+              endTime: req.body.endTime,
+              comments: req.body.comments,
+              clients: clientList
+            });
           })
           .catch(err => console.log(err));
-      })
-      .catch(err => console.log(err))
-  }
+
+
+      } else {
+        Timesheet.findOne({
+            _id: req.params.id
+          })
+          .then(timesheet => {
+            let date = new Date(`${req.body.date}T05:00:00.000Z`);
+            let startTime = new Date(`${req.body.date} ${req.body.startTime}:00`);
+            let endTime = new Date(`${req.body.date} ${req.body.endTime}:00`);
+            let duration = endTime.getTime() - startTime.getTime()
+
+
+            timesheet.task = req.body.task;
+            timesheet.client = req.body.client;
+            timesheet.date = date;
+            timesheet.startTime = startTime;
+            timesheet.endTime = endTime;
+            timesheet.comments = req.body.comments;
+            timesheet.duration = duration;
+            timesheet.save()
+              .then(timesheet => {
+                res.redirect('/timesheets/add');
+              })
+              .catch(err => console.log(err));
+          })
+          .catch(err => console.log(err))
+      }
+    })
+    .catch(err => console.log(err))
+
+
+  // let errors = [];
+
+  // if (!req.body.task) {
+  //   errors.push({
+  //     text: 'Please provide a task',
+  //     task: true
+  //   });
+  // }
+  // if (!req.body.client) {
+  //   errors.push({
+  //     text: 'Please provide a client',
+  //     client: true
+  //   });
+  // }
+  // if (!req.body.date) {
+  //   errors.push({
+  //     text: 'Please provide a date',
+  //     date: true
+  //   });
+  // }
+  // if (!req.body.startTime) {
+  //   errors.push({
+  //     text: 'Please provide a start time',
+  //     startTime: true
+  //   });
+  // }
+  // if (!req.body.endTime) {
+  //   errors.push({
+  //     text: 'Please provide an end time',
+  //     endTime: true
+  //   });
+  // }
+  // if (req.body.startTime > req.body.endTime) {
+  //   errors.push({
+  //     text: 'Please provide a valid start or end time',
+  //     validTime: true
+  //   });
+  // }
+
+  // if (errors.length > 0) {
+  //   Client.find({})
+  //     .then(clients => {
+  //       let clientList = clients.map(client => {
+  //         return {
+  //           value: client._id,
+  //           text: `${client.name} - ${client.manager.firstName} ${client.manager.lastName} - ${client.manager.position}`
+  //         }
+  //       })
+  //       res.render('timesheets/edit', {
+  //         _id: req.params.id,
+  //         errors: errors,
+  //         task: req.body.task,
+  //         client: req.body.client,
+  //         date: req.body.date,
+  //         startTime: req.body.startTime,
+  //         endTime: req.body.endTime,
+  //         comments: req.body.comments,
+  //         clients: clientList
+  //       });
+  //     })
+  //     .catch(err => console.log(err));
+
+  // } else {
+  //   Timesheet.findOne({
+  //       _id: req.params.id
+  //     })
+  //     .then(timesheet => {
+  //       let date = new Date(`${req.body.date}T05:00:00.000Z`);
+  //       let startTime = new Date(`${req.body.date} ${req.body.startTime}:00`);
+  //       let endTime = new Date(`${req.body.date} ${req.body.endTime}:00`);
+  //       let duration = endTime.getTime() - startTime.getTime()
+
+
+  //       timesheet.task = req.body.task;
+  //       timesheet.client = req.body.client;
+  //       timesheet.date = date;
+  //       timesheet.startTime = startTime;
+  //       timesheet.endTime = endTime;
+  //       timesheet.comments = req.body.comments;
+  //       timesheet.duration = duration;
+  //       timesheet.save()
+  //         .then(timesheet => {
+  //           res.redirect('/timesheets/add');
+  //         })
+  //         .catch(err => console.log(err));
+  //     })
+  //     .catch(err => console.log(err))
+  // }
 });
 
 // delete (get)
@@ -435,6 +551,7 @@ router.delete('/delete/:id', ensureAuthenticated, (req, res) => {
         })
         .catch(err => console.log(err));
     })
+
     .catch(err => console.log(err))
 });
 

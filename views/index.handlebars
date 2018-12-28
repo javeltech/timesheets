@@ -6,5 +6,8 @@
 <div class="jumbotron text-left mt-5 landing">
   <h5 class="display-3">Timesheets</h5>
   <p class="lead text-left">A simple time sheet Web Application that will help log overtime for in office employees and to track billing hours for contractors.</p>
+  {{#if user}}
+  {{else}}
   <a href="/users/login" class="btn btn-success">Login Here</a>
+  {{/if}}
 </div>

@@ -11,7 +11,7 @@ const flash = require('connect-flash');
 
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 const Client = require('./models/Client');
 const User = require('./models/User');
@@ -42,10 +42,13 @@ app.engine('handlebars', exphbs({
   }));
 app.set('view engine', 'handlebars');
 
+// db config
+const db = require('./config/database');
+
 // mongoose middleware
-let remoteDB = 'mongodb://javel:Tim3sh33t!1@ds243054.mlab.com:43054/timesheets';
+
 let localDB = 'mongodb://localhost/timesheets';
-mongoose.connect(remoteDB, {
+mongoose.connect(db.mongoURI, {
     useNewUrlParser: true
   })
   .then(() => console.log('MongoDB connected'))
@@ -82,11 +85,11 @@ app.use(methodOverride('_method'));
 // // create client
 // app.use((req, res, next) => {
 //   const client = new Client({
-//     name: 'JMMB',
+//     name: 'Wilson pharmaceutics',
 //     manager: {
-//       firstName: 'Mario',
-//       lastName: 'Murray',
-//       position: 'General Manager'
+//       firstName: 'Nasha',
+//       lastName: 'Wilson',
+//       position: 'Manager'
 //     }
 //   })
 //   client.save()
@@ -103,7 +106,7 @@ app.use(methodOverride('_method'));
 //   const user = new User({
 //     firstName: 'Javel',
 //     lastName: 'Wilson',
-//     email: 'nashaawilson@gmail.com',
+//     email: 'javelawilson@gmail.com',
 //     password: '1234567'
 //   });
 
