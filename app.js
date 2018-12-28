@@ -146,7 +146,7 @@ app.use('/users', users);
 app.use('/timesheets', timesheets);
 // invalid route redirect
 app.get('/*', function(req, res) {
-  res.redirect('/')
+  res.redirect('/');
 });
 
 
